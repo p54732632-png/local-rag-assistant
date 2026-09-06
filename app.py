@@ -190,6 +190,20 @@ def _inject_design_system() -> None:
         .stChatMessage { border: 1px solid var(--td-line); border-radius: 17px; margin: 0.7rem 0; padding: 0.95rem 1.1rem; }
         [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) { background: rgba(255, 255, 255, 0.86); margin-left: 12%; }
         [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) { background: linear-gradient(135deg, rgba(238, 242, 255, 0.78), rgba(245, 243, 255, 0.78)); border-color: rgba(129, 140, 248, 0.25); margin-right: 6%; }
+        [data-testid="stBottom"],
+        [data-testid="stChatInput"] {
+            box-shadow: 0 -8px 24px -4px rgba(15, 23, 42, 0.06) !important;
+            border-radius: 16px !important;
+        }
+        [data-testid="stChatInput"] textarea {
+            box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05) !important;
+            border: 1px solid rgba(226, 232, 240, 0.9) !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+        [data-testid="stChatInput"] textarea:focus {
+            border-color: #6366F1 !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+        }
         [data-testid="stExpander"] { background: rgba(255, 255, 255, 0.48); border: 1px solid var(--td-line); border-radius: 12px; }
         .td-citation { margin: 0.25rem 0 0.8rem; }
         .td-citation-meta { align-items: center; display: flex; flex-wrap: wrap; gap: 0.4rem; }
@@ -271,7 +285,6 @@ def _render_sidebar(indexer: DocumentIndexer, engine: RAGEngine) -> str | None:
     """Render document management controls and return the selected filter."""
     with st.sidebar:
         user_email = getattr(st.user, "email", "Authenticated User")
-        st.sidebar.caption(f"Signed in as: **{user_email}**")
         email = html.escape(str(user_email))
         st.markdown(
             f"""
