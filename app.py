@@ -82,6 +82,9 @@ def _render_sidebar(indexer: DocumentIndexer, engine: RAGEngine) -> str | None:
     """Render document management controls and return the selected filter."""
     with st.sidebar:
         st.title("Document Vault")
+        st.sidebar.caption(f"Signed in as: **{st.user.email}**")
+        if st.sidebar.button("Log out"):
+            st.logout()
         if st.session_state.pop("reset_notice", False):
             st.success("All documents and the search index were cleared.")
 
@@ -217,6 +220,13 @@ def main() -> None:
         page_icon="📄",
         layout="wide",
     )
+    if not st.user.is_logged_in:
+        st.title("🔒 TalkToDock - Access Restricted")
+        st.info("Sign in with your Google account to access your document assistant.")
+        if st.button("Log in with Google", type="primary"):
+            st.login("google")
+        st.stop()
+
     _initialize_session_state()
 
     try:
