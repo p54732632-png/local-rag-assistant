@@ -1,0 +1,21 @@
+# Environment secrets (CRITICAL: never commit your API keys)
+.env
+
+# Vector database files (local SQLite storage)
+chroma_db/
+
+# Uploaded test files
+uploads/
+
+# Python cache & virtual environment
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Streamlit temporary config
+# Ignore local Streamlit run state/cache, but allow config.toml
+.streamlit/*
+!.streamlit/config.toml
