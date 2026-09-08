@@ -128,7 +128,7 @@ class RAGEngine:
             persist_directory=str(self.persist_dir),
         )
         self.llm = ChatGroq(
-    model="llama-3.1-8b-instant",
+    model="llama3-8b-8192",
     groq_api_key=groq_key,
     temperature=0.2,
 )
