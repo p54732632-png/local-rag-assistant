@@ -121,10 +121,10 @@ class RAGEngine:
             persist_directory=str(self.persist_dir),
         )
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",
-            google_api_key=gemini_key,
-            temperature=0.2,
-        )
+    model="gemini-3.6-flash",
+    google_api_key=gemini_key,
+    temperature=0.2,
+)
         self.prompt = ChatPromptTemplate.from_messages(
             [
                 SystemMessagePromptTemplate.from_template(
