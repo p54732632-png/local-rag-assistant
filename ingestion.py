@@ -6,8 +6,9 @@ import logging
 import os
 import shutil
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
+import streamlit as st
 from dotenv import load_dotenv
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import PyPDFLoader
@@ -33,6 +34,16 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def _get_secret(key: str) -> Optional[str]:
+    """Retrieve secret safely from Streamlit secrets or OS environment."""
+    try:
+        if hasattr(st, "secrets") and key in st.secrets:
+            return st.secrets[key]
+    except Exception:
+        pass
+    return os.getenv(key)
+
+
 class DocumentIndexer:
     """Load PDF documents, create Gemini embeddings, and persist them in Chroma."""
 
@@ -49,10 +60,10 @@ class DocumentIndexer:
         self.upload_dir.mkdir(parents=True, exist_ok=True)
         self.persist_dir.mkdir(parents=True, exist_ok=True)
 
-        api_key = os.getenv("GEMINI_API_KEY")
+        api_key = _get_secret("GEMINI_API_KEY")
         if not api_key:
             raise EnvironmentError(
-                "GEMINI_API_KEY is not set. Add it to the environment or a .env file."
+                "GEMINI_API_KEY is not set. Add it to Streamlit secrets or a .env file."
             )
         self.embeddings = GoogleGenerativeAIEmbeddings(
             model="gemini-embedding-001",
