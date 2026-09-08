@@ -20,8 +20,7 @@ from langchain_core.prompts import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 load_dotenv(dotenv_path=PROJECT_ROOT / ".env")
@@ -108,12 +107,6 @@ class RAGEngine:
                 "GEMINI_API_KEY is not set. Add it to Streamlit secrets or .env file."
             )
 
-        groq_key = _get_secret("GROQ_API_KEY")
-        if not groq_key:
-            raise EnvironmentError(
-                "GROQ_API_KEY is not set. Add it to Streamlit secrets or .env file."
-            )
-
         self.persist_dir = Path(persist_dir)
         self.collection_name = collection_name
         self.upload_dir = PROJECT_ROOT / "uploads"
@@ -127,11 +120,11 @@ class RAGEngine:
             embedding_function=self.embeddings,
             persist_directory=str(self.persist_dir),
         )
-        self.llm = ChatGroq(
-    model="llama3-8b-8192",
-    groq_api_key=groq_key,
-    temperature=0.2,
-)
+        self.llm = ChatGoogleGenerativeAI(
+            model="gemini-2.5-flash",
+            google_api_key=gemini_key,
+            temperature=0.2,
+        )
         self.prompt = ChatPromptTemplate.from_messages(
             [
                 SystemMessagePromptTemplate.from_template(
