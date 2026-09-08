@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
+import ast
+import json
 import logging
 import os
 import time
-import ast
-import json
 from pathlib import Path
 from pprint import pprint
 from typing import List, Optional, Tuple, TypedDict
 
+import streamlit as st
 from dotenv import load_dotenv
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
@@ -21,7 +22,6 @@ from langchain_core.prompts import (
 )
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_groq import ChatGroq
-import streamlit as st
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 load_dotenv(dotenv_path=PROJECT_ROOT / ".env")
@@ -37,6 +37,16 @@ NO_RELEVANT_INFO = (
     "I cannot find any relevant information in the provided documents "
     "to answer this question."
 )
+
+
+def _get_secret(key: str) -> Optional[str]:
+    """Retrieve secret safely from Streamlit secrets or OS environment."""
+    try:
+        if hasattr(st, "secrets") and key in st.secrets:
+            return st.secrets[key]
+    except Exception:
+        pass
+    return os.getenv(key)
 
 
 def _extract_human_text(content: object) -> str:
@@ -92,18 +102,25 @@ class RAGEngine:
         collection_name: str = "rag_knowledge_base",
     ) -> None:
         """Connect to an existing Chroma collection and initialize the chat model."""
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
+        gemini_key = _get_secret("GEMINI_API_KEY")
+        if not gemini_key:
             raise EnvironmentError(
-                "GEMINI_API_KEY is not set. Add it to the environment or a .env file."
+                "GEMINI_API_KEY is not set. Add it to Streamlit secrets or .env file."
+            )
+
+        groq_key = _get_secret("GROQ_API_KEY")
+        if not groq_key:
+            raise EnvironmentError(
+                "GROQ_API_KEY is not set. Add it to Streamlit secrets or .env file."
             )
 
         self.persist_dir = Path(persist_dir)
         self.collection_name = collection_name
         self.upload_dir = PROJECT_ROOT / "uploads"
+
         self.embeddings = GoogleGenerativeAIEmbeddings(
             model="gemini-embedding-001",
-            google_api_key=api_key,
+            google_api_key=gemini_key,
         )
         self.vector_store = Chroma(
             collection_name=self.collection_name,
@@ -112,7 +129,7 @@ class RAGEngine:
         )
         self.llm = ChatGroq(
             model="llama-3.3-70b-versatile",
-            api_key=st.secrets.get("GROQ_API_KEY"),
+            groq_api_key=groq_key,
             temperature=0.2,
         )
         self.prompt = ChatPromptTemplate.from_messages(
