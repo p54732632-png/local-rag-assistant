@@ -128,10 +128,10 @@ class RAGEngine:
             persist_directory=str(self.persist_dir),
         )
         self.llm = ChatGroq(
-            model="llama-3.3-70b-versatile",
-            groq_api_key=groq_key,
-            temperature=0.2,
-        )
+    model="llama-3.1-8b-instant",
+    groq_api_key=groq_key,
+    temperature=0.2,
+)
         self.prompt = ChatPromptTemplate.from_messages(
             [
                 SystemMessagePromptTemplate.from_template(
