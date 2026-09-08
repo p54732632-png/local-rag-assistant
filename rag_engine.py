@@ -19,7 +19,9 @@ from langchain_core.prompts import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
-from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_groq import ChatGroq
+import streamlit as st
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 load_dotenv(dotenv_path=PROJECT_ROOT / ".env")
@@ -108,10 +110,10 @@ class RAGEngine:
             embedding_function=self.embeddings,
             persist_directory=str(self.persist_dir),
         )
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",
+        self.llm = ChatGroq(
+            model="llama-3.3-70b-versatile",
+            api_key=st.secrets.get("GROQ_API_KEY"),
             temperature=0.2,
-            google_api_key=api_key,
         )
         self.prompt = ChatPromptTemplate.from_messages(
             [
